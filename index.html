@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير سوق السيدان 2026</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Arabic Font (Tajawal) -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Icons Components (Replacing Lucide Imports for Single File) ---
+        const Car = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+        );
+        const AlertCircle = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        );
+        const CheckCircle = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        );
+        const TrendingUp = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        );
+        const DollarSign = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        );
+        const Award = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        );
+        const Shield = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        );
+        const Zap = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        );
+        const Search = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        );
+
+        // --- Main App Component ---
+        const App = () => {
+            // State for calculator
+            const [interestRateInput, setInterestRateInput] = useState('15');
+            const [downPayment, setDownPayment] = useState(300000);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [activeTab, setActiveTab] = useState('table'); // 'table', 'analysis', 'recommendations'
+
+            // Determine rate to use (default 15 if empty)
+            const rate = interestRateInput === '' ? 15 : parseFloat(interestRateInput);
+
+            // Data: Technical Analysis (By Model)
+            const carAnalysis = [
+                {
+                id: 1,
+                model: "بروتون ساجا (Proton Saga)",
+                origin: "ماليزي (استيراد)",
+                specs: "1332 سي سي (95 حصان) + 4 سرعات أوتوماتيك",
+                pros: "هيكل قوي، هندسة تعليق لوتس (ثبات ممتاز)، أرخص سيدان مستوردة.",
+                cons: "ضيق المساحة الخلفية والشنطة، توفر قطع الغيار أقل من الكوري والياباني.",
+                verdict: "خيار اقتصادي لمن يبحث عن الأداء والثبات.",
+                priceRange: "649,900"
+                },
+                {
+                id: 2,
+                model: "رينو تاليانت (Renault Taliant)",
+                origin: "علامة فرنسية (تجميع مغربي/تركي)",
+                specs: "1.0 لتر تيربو (100 حصان) + CVT",
+                pros: "محرك تيربو، عزم جيد، استهلاك بنزين ممتاز، تصميم حديث.",
+                cons: "ارتفاع أسعار قطع الغيار الخارجية، ضرورة الصيانة بالتوكيل (للتيربو).",
+                verdict: "البديل العصري للوجان بتكنولوجيا أفضل.",
+                priceRange: "674,900 - 724,900"
+                },
+                {
+                id: 3,
+                model: "نيسان صني (Nissan Sunny N17)",
+                origin: "ياباني (تجميع محلي)",
+                specs: "1.5 لتر (108 حصان) + 4 سرعات أوتوماتيك",
+                pros: "سهولة إعادة البيع، تكييف قوي، صالون واسع، قطع غيار متوفرة.",
+                cons: "ثبات ضعيف، وزن خفيف، أمان ضعيف في الفئات الأولى.",
+                verdict: "معشوقة الجماهير والخيار الآمن.",
+                priceRange: "690,000 - 795,000"
+                },
+                {
+                id: 4,
+                model: "شيفروليه أوبترا (Chevrolet Optra)",
+                origin: "أمريكي/صيني (تجميع محلي)",
+                specs: "1.5 لتر (110 حصان) + 6 سرعات أوتوماتيك",
+                pros: "عائلية كبيرة، مريحة، اعتمادية للسفر.",
+                cons: "تصميم قديم جداً، استهلاك وقود مرتفع نسبياً.",
+                verdict: "سيارة كلاسيكية لمن لا يهتم بالشكل الحديث.",
+                priceRange: "699,900"
+                },
+                {
+                id: 5,
+                model: "شيري أريزو 5 (Chery Arrizo 5)",
+                origin: "صيني (تجميع محلي)",
+                specs: "1.5 لتر (114 حصان) + CVT",
+                pros: "أفضل مواصفات مقابل سعر (فتحة سقف، شاشة)، تحسن التقفيل.",
+                cons: "عفشة ناشفة، فتيس CVT يحتاج معاملة هادئة.",
+                verdict: "قيمة ممتازة للميزانيات المتوسطة.",
+                priceRange: "705,000 - 735,000"
+                },
+                {
+                id: 6,
+                model: "بي واي دي F3 (BYD F3)",
+                origin: "صيني (تجميع محلي)",
+                specs: "1.5 لتر (108 حصان) + CVT",
+                pros: "سيارة العمل الشاق، قطع غيار رخيصة جداً.",
+                cons: "تصميم قديم، خامات اقتصادية بحتة.",
+                verdict: "الحصان الرابح للميزانيات المحدودة والعمل.",
+                priceRange: "730,000"
+                },
+                {
+                id: 7,
+                model: "ميتسوبيشي أتراج (Mitsubishi Attrage)",
+                origin: "ياباني (تجميع تايلاندي)",
+                specs: "1.2 لتر 3 سلندر (76 حصان) + CVT",
+                pros: "ملكة توفير البنزين، يابانية بالكامل.",
+                cons: "محرك ضعيف (3 سلندر)، ضيقة، أداء متواضع مع التكييف.",
+                verdict: "الأفضل لمن يضع توفير الوقود كأولوية قصوى.",
+                priceRange: "740,000"
+                },
+                {
+                id: 8,
+                model: "بايك يو 5 بلس (BAIC U5 Plus)",
+                origin: "صيني (استيراد)",
+                specs: "1.5 لتر (111 حصان) + CVT",
+                pros: "تصميم فخم، شاشات ديجيتال، مقاعد مريحة، قيمة مقابل سعر.",
+                cons: "تحدي الانتشار وتوفر قطع الغيار.",
+                verdict: "الحصان الأسود لمحبي الفخامة بسعر اقتصادي.",
+                priceRange: "724,900 - 854,900"
+                },
+                {
+                id: 9,
+                model: "هيونداي أكسنت RB (Hyundai Accent RB)",
+                origin: "كوري (تجميع محلي)",
+                specs: "1.6 لتر (125 حصان) + 4 سرعات أوتوماتيك",
+                pros: "الأقوى أداءً، تسارع ممتاز، عفشة متماسكة.",
+                cons: "قلة وسائل الأمان في الفئات الأولى، استهلاك بنزين عالي.",
+                verdict: "للشباب ومحبي الجري.",
+                priceRange: "729,900 - 839,000"
+                },
+                {
+                id: 10,
+                model: "دونج فنج شاين (Dongfeng Shine)",
+                origin: "صيني (استيراد)",
+                specs: "1.5 لتر تنفس طبيعي",
+                pros: "تصميم رياضي هجومي، مقصورة رياضية.",
+                cons: "إعادة البيع وقطع الغيار غير مختبرة بقوة.",
+                verdict: "لمن يريد التميز والابتعاد عن التقليدية.",
+                priceRange: "790,000"
+                },
+                {
+                id: 11,
+                model: "سوزوكي ديزاير (Suzuki Dzire)",
+                origin: "ياباني (تجميع هندي)",
+                specs: "1.2 لتر (85 حصان) + AGS",
+                pros: "اقتصادية جداً، واسعة من الداخل.",
+                cons: "ارتفاع سعرها (830 ألف) يضعها في منافسة صعبة.",
+                verdict: "خيار جيد ولكن سعره أصبح مرتفعاً.",
+                priceRange: "829,900"
+                },
+                {
+                id: 12,
+                model: "جيلي إمجراند (Geely Emgrand)",
+                origin: "صيني (استيراد/تجميع)",
+                specs: "1.5 لتر (102 حصان) + CVT 8 سرعات",
+                pros: "جيل جديد كلياً، عزل ممتاز، خامات راقية.",
+                cons: "لا تزال تبني سمعتها الجديدة.",
+                verdict: "نقلة نوعية ومنافس شرس لـ MG 5.",
+                priceRange: "839,000"
+                },
+                {
+                id: 13,
+                model: "سوزوكي سياز (Suzuki Ciaz)",
+                origin: "ياباني (تجميع هندي)",
+                specs: "1.5 لتر (104 حصان) + 4 سرعات أوتوماتيك",
+                pros: "الأوسع في فئتها (ليموزين)، اعتمادية.",
+                cons: "صاج خارجي خفيف، قطع غيار خارجية غالية.",
+                verdict: "الخيار العائلي الأول للراحة.",
+                priceRange: "809,900 - 874,900"
+                },
+                {
+                id: 14,
+                model: "هيونداي إلنترا HD (Hyundai Elantra HD)",
+                origin: "كوري (تجميع محلي)",
+                specs: "1.6 لتر (121 حصان) + 4 سرعات أوتوماتيك",
+                pros: "الجمل الذي لا يشتكي، اعتمادية قصوى، قطع غيار متوفرة.",
+                cons: "تصميم قديم جداً.",
+                verdict: "استثمار مضمون بدون مفاجآت.",
+                priceRange: "890,000"
+                },
+                {
+                id: 15,
+                model: "نيسان سنترا (Nissan Sentra)",
+                origin: "ياباني (تجميع محلي)",
+                specs: "1.6 لتر (118 حصان) + CVT",
+                pros: "فئة C بسعر B، راحة ركوب، عزل ممتاز.",
+                cons: "حجم كبير في الزحام.",
+                verdict: "رفاهية الفئات الأعلى بسعر معقول.",
+                priceRange: "899,000"
+                },
+                {
+                id: 16,
+                model: "هيونداي إلنترا AD (Hyundai Elantra AD)",
+                origin: "كوري (تجميع محلي)",
+                specs: "1.6 لتر (127 حصان) + 6 سرعات أوتوماتيك",
+                pros: "شكل محبوب، ثبات، تكنولوجيا، تصميم عصري.",
+                cons: "الفئة المتاحة هي الأولى فقط.",
+                verdict: "صفقة قوية جداً حالياً.",
+                priceRange: "899,000"
+                },
+                {
+                id: 17,
+                model: "إم جي 5 (MG 5)",
+                origin: "صيني (استيراد)",
+                specs: "1.5 لتر (120 حصان) + CVT",
+                pros: "الأكثر تجهيزاً وأماناً (ESP قياسي)، ثبات ممتاز.",
+                cons: "انخفاضها القريب من الأرض.",
+                verdict: "سيارة متكاملة بتجهيزات أوروبية.",
+                priceRange: "899,990"
+                }
+            ];
+
+            // Data: Financial Table Inputs (Trims)
+            const financialData = [
+                { name: "Proton Saga", trim: "Premium", price: 649900 },
+                { name: "Renault Taliant", trim: "Evolution", price: 674900 },
+                { name: "Nissan Sunny", trim: "Base A/T", price: 690000 },
+                { name: "Chevrolet Optra", trim: "Ls", price: 699900 },
+                { name: "Chery Arrizo 5", trim: "Baseline Lth", price: 705000 },
+                { name: "BAIC U5 Plus", trim: "Comfort", price: 724900 },
+                { name: "Renault Taliant", trim: "Techno", price: 724900 },
+                { name: "Hyundai Accent RB", trim: "GL", price: 729900 },
+                { name: "BYD F3", trim: "A/T", price: 730000 },
+                { name: "Chery Arrizo 5", trim: "Highline", price: 735000 },
+                { name: "Mitsubishi Attrage", trim: "Highline", price: 740000 },
+                { name: "Nissan Sunny", trim: "Plus A/T", price: 745000 },
+                { name: "Hyundai Accent RB", trim: "SR", price: 759900 },
+                { name: "BAIC U5 Plus", trim: "Highline", price: 769900 },
+                { name: "Dongfeng Shine", trim: "Advance", price: 790000 },
+                { name: "Nissan Sunny", trim: "Super Saloon", price: 795000 },
+                { name: "Hyundai Accent RB", trim: "DAB ABS", price: 800000 },
+                { name: "Suzuki Ciaz", trim: "GL", price: 809900 },
+                { name: "Suzuki Dzire", trim: "GLX", price: 829900 },
+                { name: "Geely Emgrand", trim: "Comfort", price: 839000 },
+                { name: "Hyundai Accent RB", trim: "Highline", price: 839000 },
+                { name: "BAIC U5 Plus", trim: "Top Line", price: 854900 },
+                { name: "Suzuki Ciaz", trim: "GLX", price: 874900 },
+                { name: "Hyundai Elantra HD", trim: "Highline", price: 890000 },
+                { name: "Nissan Sentra", trim: "Highline", price: 899000 },
+                { name: "Hyundai Elantra AD", trim: "Smart", price: 899000 },
+                { name: "MG 5", trim: "Luxury", price: 899990 },
+            ];
+
+            // Calculation Function (Flat Rate)
+            const calculateLoan = (price, years) => {
+                const remainder = price - downPayment;
+                if (remainder <= 0) return { installment: 0, total: 0, remainder: 0 };
+                
+                // Simple Interest Formula: (Principal + (Principal * Rate * Years)) / Months
+                const totalInterest = remainder * (rate / 100) * years;
+                const totalAmount = remainder + totalInterest;
+                const monthlyInstallment = totalAmount / (years * 12);
+                
+                return {
+                remainder: remainder,
+                installment: Math.round(monthlyInstallment),
+                total: Math.round(totalAmount)
+                };
+            };
+
+            const filteredFinancials = financialData.filter(car => 
+                car.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                car.trim.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            return (
+                <div className="min-h-screen">
+                
+                {/* Header */}
+                <header className="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+                    <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+                    <div className="flex items-center gap-2 mb-4 md:mb-0">
+                        <Car className="text-blue-400 w-8 h-8" />
+                        <div>
+                        <h1 className="text-xl font-bold">تقرير سوق السيارات المصري</h1>
+                        <p className="text-xs text-slate-400">إصدار يناير 2026 - فئة السيدان</p>
+                        </div>
+                    </div>
+                    
+                    <nav className="flex gap-2">
+                        <button 
+                        onClick={() => setActiveTab('table')}
+                        className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'table' ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}
+                        >
+                        الحسابات المالية
+                        </button>
+                        <button 
+                        onClick={() => setActiveTab('analysis')}
+                        className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'analysis' ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}
+                        >
+                        التحليل الفني
+                        </button>
+                        <button 
+                        onClick={() => setActiveTab('recommendations')}
+                        className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'recommendations' ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}
+                        >
+                        التوصيات
+                        </button>
+                    </nav>
+                    </div>
+                </header>
+
+                {/* Main Content */}
+                <main className="container mx-auto px-4 py-8">
+                    
+                    {/* Intro */}
+                    <section className="mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <TrendingUp className="text-blue-600" />
+                        نظرة عامة
+                    </h2>
+                    <p className="text-slate-600 leading-relaxed">
+                        يشتمل هذا التقرير على جميع سيارات السيدان الأوتوماتيك المتاحة حالياً في السوق المصري تحت سقف الـ 900,000 جنيه. تم استبعاد السيارات الهاتشباك والـ SUV للتركيز حصرياً على فئة السيدان.
+                    </p>
+                    </section>
+
+                    {/* Global Controls (Always visible) */}
+                    <section className="mb-8 bg-blue-50 p-6 rounded-xl border border-blue-100 shadow-sm sticky top-24 z-40">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                        <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">سعر الفائدة (%)</label>
+                        <div className="relative">
+                            <input 
+                            type="number" 
+                            value={interestRateInput}
+                            onChange={(e) => setInterestRateInput(e.target.value)}
+                            placeholder="15"
+                            className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none pl-10"
+                            />
+                            <span className="absolute left-3 top-3 text-slate-400 font-bold">%</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">إذا تركت فارغة سيتم الحساب على 15%</p>
+                        </div>
+
+                        <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">المقدم (جنيه مصري)</label>
+                        <input 
+                            type="number" 
+                            value={downPayment}
+                            onChange={(e) => setDownPayment(Number(e.target.value))}
+                            className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                        </div>
+
+                        <div>
+                        <div className="bg-white p-3 rounded-lg border border-blue-200">
+                            <p className="text-sm text-slate-500">سعر الفائدة المطبق حالياً:</p>
+                            <p className="text-2xl font-bold text-blue-700">{rate}%</p>
+                        </div>
+                        </div>
+                    </div>
+                    </section>
+
+                    {/* Tab Content: Financial Tables */}
+                    {activeTab === 'table' && (
+                    <div className="animate-fade-in">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-slate-800 mb-2 md:mb-0">جدول الأقساط المقارن</h3>
+                            <div className="relative w-full md:w-64">
+                                <Search className="absolute right-3 top-3 text-slate-400 w-5 h-5" />
+                                <input 
+                                    type="text"
+                                    placeholder="ابحث عن سيارة..."
+                                    className="w-full pr-10 pl-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-slate-200">
+                        <table className="w-full min-w-[1000px]">
+                            <thead className="bg-slate-800 text-white">
+                            <tr>
+                                <th className="p-4 text-right">السيارة</th>
+                                <th className="p-4 text-right">الفئة</th>
+                                <th className="p-4 text-right">السعر الرسمي</th>
+                                <th className="p-4 text-right bg-slate-700">المتبقي للقسط</th>
+                                <th className="p-4 text-center bg-blue-900">قسط 5 سنوات</th>
+                                <th className="p-4 text-center bg-emerald-900">قسط 7 سنوات</th>
+                            </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                            {filteredFinancials.map((car, index) => {
+                                const loan5 = calculateLoan(car.price, 5);
+                                const loan7 = calculateLoan(car.price, 7);
+                                
+                                return (
+                                <tr key={index} className="hover:bg-slate-50 transition-colors">
+                                    <td className="p-4 font-bold text-slate-800">{car.name}</td>
+                                    <td className="p-4 text-slate-600 text-sm">{car.trim}</td>
+                                    <td className="p-4 font-mono font-medium">{car.price.toLocaleString()} ج.م</td>
+                                    <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan5.remainder > 0 ? loan5.remainder.toLocaleString() : 0} ج.م</td>
+                                    <td className="p-4 text-center bg-blue-50 font-bold text-blue-700 font-mono text-lg">
+                                    {loan5.remainder > 0 ? loan5.installment.toLocaleString() : '-'}
+                                    </td>
+                                    <td className="p-4 text-center bg-emerald-50 font-bold text-emerald-700 font-mono text-lg">
+                                    {loan7.remainder > 0 ? loan7.installment.toLocaleString() : '-'}
+                                    </td>
+                                </tr>
+                                );
+                            })}
+                            </tbody>
+                        </table>
+                        {filteredFinancials.length === 0 && (
+                            <div className="p-8 text-center text-slate-500">لا توجد نتائج مطابقة للبحث</div>
+                        )}
+                        </div>
+                        <div className="mt-4 text-sm text-slate-500 flex gap-2 items-center">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>يتم حساب الفائدة بنظام الفائدة الثابتة (Flat Rate) على المبلغ المتبقي طوال فترة التقسيط.</span>
+                        </div>
+                    </div>
+                    )}
+
+                    {/* Tab Content: Technical Analysis */}
+                    {activeTab === 'analysis' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                        {carAnalysis.map((car) => (
+                        <div key={car.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                            <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                            <h3 className="font-bold text-lg text-slate-800">{car.model}</h3>
+                            <span className="bg-white px-2 py-1 rounded text-xs border border-slate-300 font-mono">{car.priceRange}</span>
+                            </div>
+                            <div className="p-5 flex-grow">
+                            <div className="mb-4">
+                                <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                                    <span className="font-semibold text-slate-700">المنشأ:</span> {car.origin}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-slate-500">
+                                    <span className="font-semibold text-slate-700">المحرك:</span> {car.specs}
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <div className="bg-green-50 p-3 rounded-lg">
+                                    <p className="text-green-800 text-sm font-semibold mb-1 flex items-center gap-1"><CheckCircle className="w-4 h-4" /> المميزات</p>
+                                    <p className="text-green-700 text-sm leading-relaxed">{car.pros}</p>
+                                </div>
+                                <div className="bg-red-50 p-3 rounded-lg">
+                                    <p className="text-red-800 text-sm font-semibold mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4" /> العيوب</p>
+                                    <p className="text-red-700 text-sm leading-relaxed">{car.cons}</p>
+                                </div>
+                            </div>
+                            </div>
+                            <div className="bg-slate-50 p-4 border-t border-slate-200">
+                                <p className="text-sm text-slate-600"><span className="font-bold text-slate-900">الخلاصة:</span> {car.verdict}</p>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                    )}
+
+                    {/* Tab Content: Recommendations */}
+                    {activeTab === 'recommendations' && (
+                    <div className="animate-fade-in space-y-6">
+                        <h3 className="text-2xl font-bold text-slate-800 mb-6">خلاصة السوق وتوصيات يناير 2026</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            {/* Winner */}
+                            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-bl-xl font-bold text-sm">الصفقة الرابحة</div>
+                                <div className="mb-4 text-yellow-600">
+                                    <Award className="w-12 h-12" />
+                                </div>
+                                <h4 className="text-xl font-bold text-slate-900 mb-2">Renault Taliant & BAIC U5 Plus</h4>
+                                <p className="text-slate-700 mb-2">في فئة الـ 725,000 جنيه</p>
+                                <ul className="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                                    <li>تاليا: محرك تيربو وتكنولوجيا حديثة.</li>
+                                    <li>بايك: جودة خامات داخلية تنافس سيارات المليون.</li>
+                                </ul>
+                            </div>
+
+                            {/* Reliable */}
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 bg-blue-500 text-white px-4 py-1 rounded-bl-xl font-bold text-sm">ملوك الاعتمادية</div>
+                                <div className="mb-4 text-blue-600">
+                                    <Shield className="w-12 h-12" />
+                                </div>
+                                <h4 className="text-xl font-bold text-slate-900 mb-2">Nissan Sunny & Elantra HD</h4>
+                                <p className="text-slate-700 mb-2">الخيار الآمن دائماً</p>
+                                <ul className="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                                    <li>صني (تبدأ من 690 ألف): سهولة صيانة وقطع غيار.</li>
+                                    <li>إلنترا HD (890 ألف): استثمار طويل الأمد رغم الشكل القديم.</li>
+                                </ul>
+                            </div>
+
+                            {/* Performance */}
+                            <div className="bg-gradient-to-br from-red-50 to-rose-50 p-6 rounded-xl border border-red-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 rounded-bl-xl font-bold text-sm">الأداء القوي</div>
+                                <div className="mb-4 text-red-600">
+                                    <Zap className="w-12 h-12" />
+                                </div>
+                                <h4 className="text-xl font-bold text-slate-900 mb-2">Hyundai Accent RB</h4>
+                                <p className="text-slate-700 mb-2">تبدأ من 730,000 جنيه</p>
+                                <p className="text-slate-600 text-sm">محرك 1.6 لتر القوي يجعلها الأسرع والأمتع في القيادة، خاصة فئة SR، رغم فقر وسائل الأمان في الفئات الأولى.</p>
+                            </div>
+
+                            {/* Luxury */}
+                            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-xl border border-emerald-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 bg-emerald-500 text-white px-4 py-1 rounded-bl-xl font-bold text-sm">الرفاهية والقيمة</div>
+                                <div className="mb-4 text-emerald-600">
+                                    <DollarSign className="w-12 h-12" />
+                                </div>
+                                <h4 className="text-xl font-bold text-slate-900 mb-2">MG 5 & Elantra AD</h4>
+                                <p className="text-slate-700 mb-2">حدود الـ 900,000 جنيه</p>
+                                <ul className="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                                    <li>MG 5: قمة التجهيزات والأمان (ESP, كاميرا 360).</li>
+                                    <li>Elantra AD: فرصة لركوب سيارة كورية حديثة بسعر منافس.</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    )}
+
+                </main>
+
+                {/* Footer */}
+                <footer className="bg-slate-900 text-slate-400 py-8 mt-12">
+                    <div className="container mx-auto px-4 text-center">
+                    <p>جميع البيانات الواردة في هذا التقرير محدثة لشهر يناير 2026</p>
+                    <p className="text-sm mt-2">الأسعار قابلة للتغيير بناءً على الوكيل والسوق</p>
+                    </div>
+                </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
