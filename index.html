@@ -176,17 +176,17 @@
 
             // Data: Financial Table Inputs (Trims)
             const financialData = [
-                { name: "Chevrolet Optra", trim: "Ls", price: 699900 },
+                // { name: "Chevrolet Optra", trim: "Ls", price: 699900 },
                 { name: "Chery Arrizo 5", trim: "Highline", price: 735000 },
-                { name: "BAIC U5 Plus", trim: "Highline", price: 769900 },
-                { name: "Hyundai Accent RB", trim: "DAB ABS", price: 800000 },
+                // { name: "BAIC U5 Plus", trim: "Highline", price: 769900 },
+                // { name: "Hyundai Accent RB", trim: "DAB ABS", price: 800000 },
                 { name: "Geely Emgrand", trim: "Comfort", price: 839000 },
                 { name: "Hyundai Accent RB", trim: "Highline", price: 839000 },
                 { name: "BAIC U5 Plus", trim: "Top Line", price: 870000 },
-                { name: "Suzuki Ciaz", trim: "GLX", price: 874900 },
+                // { name: "Suzuki Ciaz", trim: "GLX", price: 874900 },
                 { name: "Hyundai Elantra HD", trim: "Highline", price: 890000 },
                 { name: "Hyundai Elantra AD", trim: "Smart", price: 899000 },
-                { name: "MG 5", trim: "Luxury", price: 899990 },
+                // { name: "MG 5", trim: "Luxury", price: 899990 },
             ];
 
             // Calculation Function (Flat Rate)
@@ -324,6 +324,8 @@
                                 <th className="p-4 text-right">الفئة</th>
                                 <th className="p-4 text-right">السعر الرسمي</th>
                                 <th className="p-4 text-right bg-slate-700">المتبقي للقسط</th>
+                                <th className="p-4 text-center bg-blue-900">قسط سنتين</th>
+                                <th className="p-4 text-center bg-blue-900">قسط 3 سنوات</th>
                                 <th className="p-4 text-center bg-blue-900">قسط 5 سنوات</th>
                                 <th className="p-4 text-center bg-emerald-900">قسط 7 سنوات</th>
                             </tr>
@@ -332,12 +334,18 @@
                             {filteredFinancials.map((car, index) => {
                                 const loan5 = calculateLoan(car.price, 5);
                                 const loan7 = calculateLoan(car.price, 7);
-                                
+                                const loan3 = calculateLoan(car.price, 3);
+                                const loan2 = calculateLoan(car.price, 2);
+
                                 return (
                                 <tr key={index} className="hover:bg-slate-50 transition-colors">
                                     <td className="p-4 font-bold text-slate-800">{car.name}</td>
                                     <td className="p-4 text-slate-600 text-sm">{car.trim}</td>
                                     <td className="p-4 font-mono font-medium">{car.price.toLocaleString()} ج.م</td>
+                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan2.remainder > 0 ? loan2.remainder.toLocaleString() : 0} ج.م</td>
+
+                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan3.remainder > 0 ? loan3.remainder.toLocaleString() : 0} ج.م</td>
+
                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan5.remainder > 0 ? loan5.remainder.toLocaleString() : 0} ج.م</td>
                                     <td className="p-4 text-center bg-blue-50 font-bold text-blue-700 font-mono text-lg">
                                     {loan5.remainder > 0 ? loan5.installment.toLocaleString() : '-'}
