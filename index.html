@@ -345,14 +345,12 @@
 
 
                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan5.remainder > 0 ? loan5.remainder.toLocaleString() : 0} ج.م</td>
-                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan2.installment > 0 ? loan2.installment.toLocaleString() : 0} ج.م</td>
-                                     <td className="p-4 font-mono text-slate-600 bg-slate-50">{loan3.installment > 0 ? loan3.installment.toLocaleString() : 0} ج.م</td>
+                                     <td className="p-4 text-center bg-blue-50 font-bold text-blue-700 font-mono text-lg">{loan2.installment > 0 ? loan2.installment.toLocaleString() : 0} ج.م</td>
+                                     <td className="p-4 text-center bg-emerald-50 font-bold text-emerald-700 font-mono text-lg">{loan3.installment > 0 ? loan3.installment.toLocaleString() : 0} ج.م</td>
+                                       <td className="p-4 text-center bg-blue-50 font-bold text-blue-700 font-mono text-lg">{loan5.installment > 0 ? loan5.installment.toLocaleString() : 0} ج.م</td>
+                                     <td className="p-4 text-center bg-emerald-50 font-bold text-emerald-700 font-mono text-lg">{loan7.installment > 0 ? loan7.installment.toLocaleString() : 0} ج.م</td>
                                     <td className="p-4 text-center bg-blue-50 font-bold text-blue-700 font-mono text-lg">
-                                    {loan5.remainder > 0 ? loan5.installment.toLocaleString() : '-'}
-                                    </td>
-                                    <td className="p-4 text-center bg-emerald-50 font-bold text-emerald-700 font-mono text-lg">
-                                    {loan7.remainder > 0 ? loan7.installment.toLocaleString() : '-'}
-                                    </td>
+                                
                                 </tr>
                                 );
                             })}
